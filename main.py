@@ -4,8 +4,10 @@ from display import display
 
 class Tetris:
     def __init__(self) -> None:
-        # self.grid = [[0] * 10] * 10
-        self.grid = [[0] * 7] * 3 + [[0] * 6 + [1] * 1] * 3 + [[0] * 3 + [1] * 4] * 3
+        self.grid = [[0] * 7 for _ in range(10)]
+        self.grid[:3] = [[0] * 7 for _ in range(3)]
+        self.grid[3:6] = [[0] * 6 + [1] * 1 for _ in range(3)]
+        self.grid[6:] = [[0] * 3 + [1] * 4 for _ in range(4)]
         self.values = {
             "q": [[1, 1], [1, 1]],
             "z": [[1, 1, 0], [0, 1, 1]],
@@ -37,11 +39,7 @@ class Tetris:
             if self.grid[x + 1][y] == 1:
                 return True
         except:
-            print("____________________________________")
-            print(x, y)
-            print(len(self.grid), len(self.grid[0]))
-            if self.grid[x - 1][y] == 1:
-                return True
+            return True
 
     def check_topmost_occupant(self, shape, position):
         current_ones = self.provide_current_ones(shape, position)
@@ -49,16 +47,10 @@ class Tetris:
         temp_curr = current_ones
         print(current_ones)
         for idx, row in enumerate(self.grid):
-            print("len cur", len(temp_curr))
             for i in range(len(temp_curr)):
                 (x, y) = temp_curr[i]
-                print("checking for ", x, y)
                 if sum(row):
-                    print("-- sum not 0")
                     if self.check_position_clash(x, y):
-                        print("---- classh check")
-                        print("current ones - ", current_ones)
-                        print("temp_curr - ", temp_curr)
                         temp_curr = current_ones
                         print("CLASHHHHH")
                         return current_ones
@@ -68,8 +60,15 @@ class Tetris:
             print("row " + str(idx) + " complete")
         return temp_curr
 
-    def find_down(shape):
-        pass
+    def update_grid(self, new_values):
+        for r_idx, row in enumerate(self.grid):
+            for c_idx, cell in enumerate(row):
+                self.grid[r_idx] = row
+                if (r_idx, c_idx) in new_values:
+                    print(r_idx, c_idx, row, new_values)
+                    self.grid[r_idx][c_idx] = 1
+
+        display(self.grid, [])
 
     def new_input(self, value: str, position: int):
         print(value, position)
@@ -77,6 +76,8 @@ class Tetris:
         print(curr)
         display(self.values[value], curr=[])
         display(self.grid, curr)
+        self.update_grid(curr)
+        # display(self.grid, [])
         pass
 
 
