@@ -1,3 +1,6 @@
+import csv
+
+
 class Tetris:
     def __init__(self) -> None:
         self.grid = [[0] * 10] * 10
@@ -12,5 +15,11 @@ class Tetris:
         }
         pass
 
-    def new_input(value, position):
+    def print_grid(self):
+        print(self.grid)
+
+    def new_input(self, value, position):
         pass
+
+
+# with open('input.txt') as inputFile:
