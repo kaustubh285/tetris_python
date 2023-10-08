@@ -5,11 +5,7 @@ from display import display
 
 class Tetris:
     def __init__(self) -> None:
-        # self.grid = [[0] * 10 for _ in range(10)]
         self.grid = [[0] * 10 for _ in range(10)]
-        # self.grid[:3] = [[0] * 7 for _ in range(3)]
-        # self.grid[3:6] = [[0] * 6 + [1] * 1 for _ in range(3)]
-        # self.grid[6:] = [[0] * 3 + [1] * 4 for _ in range(4)]
         self.values = {
             "q": [[1, 1], [1, 1]],
             "z": [[1, 1, 0], [0, 1, 1]],
@@ -20,9 +16,6 @@ class Tetris:
             "j": [[0, 1], [0, 1], [1, 1]],
         }
         pass
-
-    def print_grid(self):
-        print(self.grid)
 
     def provide_current_ones(self, shape, position):
         num_rows = len(shape)
@@ -50,7 +43,6 @@ class Tetris:
         for idx, row in enumerate(self.grid):
             for i in range(len(temp_curr)):
                 (x, y) = temp_curr[i]
-                print(x, y)
                 if self.check_position_clash(x, y):
                     print("CLASHHHHH at", x, y)
                     return current_ones
@@ -64,17 +56,22 @@ class Tetris:
             for c_idx, cell in enumerate(row):
                 if (r_idx, c_idx) in new_values:
                     self.grid[r_idx][c_idx] = 1
-        display(self.grid, [])
 
     def new_input(self, value: str, position: int):
         print(value, position)
         curr = self.check_topmost_occupant(self.values[value], position)
-        print("current_ones_results - ", curr)
         display(self.values[value], curr=[])
         display(self.grid, curr)
         self.update_grid(curr)
-        # display(self.grid, [])
-        pass
+        self.check_if_row_complete()
+        display(self.grid, [])
+
+    def check_if_row_complete(self):
+        for idx, rows in enumerate(self.grid):
+            if sum(rows) == 10:
+                del self.grid[idx:]
+                # self.grid.append([0] * 10)
+                self.grid = self.grid[: idx + 1] + [[0] * 10] + self.grid[idx + 1 :]
 
 
 with open("temp_input.txt") as inputFile:
