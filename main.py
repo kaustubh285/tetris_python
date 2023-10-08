@@ -69,9 +69,10 @@ class Tetris:
     def check_if_row_complete(self):
         for idx, rows in enumerate(self.grid):
             if sum(rows) == 10:
-                del self.grid[idx:]
+                # del self.grid[idx:]
                 # self.grid.append([0] * 10)
-                self.grid = self.grid[: idx + 1] + [[0] * 10] + self.grid[idx + 1 :]
+                # self.grid = self.grid[: idx + 1] + [[0] * 10] + self.grid[idx + 1 :]
+                self.grid = [[0] * 10] + self.grid[:idx] + self.grid[idx + 1 :]
 
 
 with open("temp_input.txt") as inputFile:
