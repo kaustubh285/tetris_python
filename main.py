@@ -1,5 +1,6 @@
 import csv
 from typing import List
+import display
 
 
 class Tetris:
@@ -18,25 +19,24 @@ class Tetris:
         self.grid_block_height = 0
 
     def provide_block_cell_positions(self, shape: List[List[int]], position: int):
-        """It would be difficult to work with a multi-dimensional array when checking the block's decent in the grid.
-        Hence, we first make a list of all the current positions in the block entering the grid.
+        """Consider the block/shape to be a matrix including 0s and 1s. We create a list of all positions in cordinate format to know at which positions the 1s will be at any given time.
         For example if a Q block is entering in position 5, then the starting list would be - [(0,5),(0,6),(1,5),(1,6)]
+        This is done because it would be difficult to work with a multi-dimensional array when checking the block's decent in the grid.
         """
-        num_rows = len(shape)
-        num_cols = len(shape[0])
+        block_num_rows = len(shape)
+        block_num_cols = len(shape[0])
         block_cell_positions = []
 
-        # This is done so that if the block is entering in the 5th column, it can be viewed as [[0,5],[0,6]] etc as the starting shape.
-        for i in range(num_rows):
-            for j in range(num_cols):
-                if shape[i][j] == 1:
-                    block_cell_positions.append((i, position + j))
+        for row in range(block_num_rows):
+            for col in range(block_num_cols):
+                if shape[row][col] == 1:
+                    block_cell_positions.append((row, position + col))
 
-        # TODO : The block is automatically placed in the grid while moving down. This can be improved to have the block outside the grid and move into the grid to help identify blockages in it's path in the first 2 rows.
+        # TODO : The block is automatically placed in the first 2 rows of the grid and then moving it  down. This can be improved to have the block above the grid and move into the grid to help identify blockages in it's path in the first 2 rows.
         return block_cell_positions
 
     def check_position_clash(self, x, y):
-        """This is a helper function that checks if the cell is at the bottom of the grid, or will hit any other block if moved downwards."""
+        """Checks if the cell is already at the bottom, or will hit any other block if moved downwards."""
         if len(self.grid) == x + 1:
             return True
         try:
@@ -47,7 +47,7 @@ class Tetris:
 
     def check_topmost_occupant(self, shape: List[List[int]], position: int):
         """Core logic.
-        This function gets the list of cells in the shape/block. It iterates through each row and checks the decent of the block through the grid.
+        Gets the list of cells in the shape/block. Iterates through each row and checks the decent of the block through the grid.
         If it reaches the bottom of the grid, or will clash with another block in the next iteration, then it stops and returns the final array of the position of the current block. eg : a Q block moving down the 5th position - [(3,5), (3,6),(4,5),(4,6)]
         """
         block_cell_positions = self.provide_block_cell_positions(shape, position)
@@ -64,7 +64,9 @@ class Tetris:
         return temp_curr
 
     def update_grid(self, new_values):
-        """Once the positions of the new block are clear, we make the changes to the grid in this function."""
+        """
+        Using the final positions of the new block cells we obtained, we change the values at those positions to "1" in the grid.
+        """
         for r_idx, row in enumerate(self.grid):
             for c_idx, cell in enumerate(row):
                 if (r_idx, c_idx) in new_values:
@@ -75,9 +77,13 @@ class Tetris:
         curr = self.check_topmost_occupant(self.values[value], position)
         self.update_grid(curr)
         self.check_if_row_complete()
+        display.display(self.grid, [])
         self.check_and_update_height()
 
     def check_and_update_height(self):
+        """
+        Calculats the updated height of blocks in the grid
+        """
         height = 0
         for idx, rows in enumerate(self.grid):
             if 1 in rows:
@@ -104,8 +110,11 @@ class Tetris:
 with open("temp_input.txt") as inputFile:
     reader_obj = csv.reader(inputFile)
     tetris = Tetris()
+
+    # For every line in the file
     for row in reader_obj:
-        for [shape, entry] in row:
-            tetris.new_input(shape.lower(), int(entry))
+        # for every Shape & position in the line we run the below forloop and then get the height logged
+        for [shape, entry_position] in row:
+            tetris.new_input(shape.lower(), int(entry_position))
 
         print(tetris.print_occupied_height())
