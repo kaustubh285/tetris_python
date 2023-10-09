@@ -105,7 +105,7 @@ class Tetris:
                 self.grid.insert(0, [0] * len(self.grid[0]))
 
 
-with open("temp_input.txt") as inputFile:
+with open("input.txt") as inputFile:
     reader_obj = csv.reader(inputFile)
     tetris = Tetris()
 
