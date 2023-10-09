@@ -16,6 +16,7 @@ class Tetris:
             "L": [[1, 0], [1, 0], [1, 1]],
             "j": [[0, 1], [0, 1], [1, 1]],
         }
+        self.block_positions = set()
         self.grid_block_height = 0
 
     def provide_block_cell_positions(self, shape: List[List[int]], position: int):
@@ -39,11 +40,9 @@ class Tetris:
         """Checks if the cell is already at the bottom, or will hit any other block if moved downwards."""
         if len(self.grid) == x + 1:
             return True
-        try:
-            if self.grid[x + 1][y] == 1:
-                return True
-        except:
+        if (x + 1, y) in self.block_positions:
             return True
+        return False
 
     def check_topmost_occupant(self, shape: List[List[int]], position: int):
         """Core logic.
@@ -71,12 +70,17 @@ class Tetris:
             for c_idx, cell in enumerate(row):
                 if (r_idx, c_idx) in new_values:
                     self.grid[r_idx][c_idx] = 1
+                    self.block_positions.add((r_idx, c_idx))
 
     def new_input(self, value: str, position: int):
         """This is the function that calls all the other functions and is triggered when a new block is added to the grid"""
-        curr = self.check_topmost_occupant(self.values[value], position)
-        self.update_grid(curr)
+        new_block_final_position = self.check_topmost_occupant(
+            self.values[value], position
+        )
+        display.display(self.grid, new_block_final_position)
+        self.update_grid(new_block_final_position)
         self.check_if_row_complete()
+
         display.display(self.grid, [])
         self.check_and_update_height()
 
